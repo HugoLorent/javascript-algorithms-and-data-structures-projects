@@ -1,79 +1,49 @@
-const equivalencies = [
-  ['PENNY', 0.01],
-  ['NICKEL', 0.05],
-  ['DIME', 0.1],
-  ['QUARTER', 0.25],
-  ['ONE', 1],
-  ['FIVE', 5],
-  ['TEN', 10],
-  ['TWENTY', 20],
-  ['ONE HUNDRED', 100],
-];
-
+// author's solution => https://medium.com/@chyanpin/solving-freecodecamp-orgs-final-project-challenge-cash-register-d6ecb941d966
 function checkCashRegister(price, cash, cid) {
-  let change = {
-    status: '',
-    change: [],
+  const UNIT_AMOUNT = {
+    PENNY: 0.01,
+    NICKEL: 0.05,
+    DIME: 0.1,
+    QUARTER: 0.25,
+    ONE: 1.0,
+    FIVE: 5.0,
+    TEN: 10.0,
+    TWENTY: 20.0,
+    'ONE HUNDRED': 100.0,
   };
-
-  let priceAndPaymentDifference = cash - price;
-  const cidSum = cid.reduce((acc, val) => {
-    if (!isNaN(acc + val[1])) {
-      return acc + val[1];
-    }
-  }, 0);
-
-  if (cidSum - priceAndPaymentDifference < 0) {
-    return (change = {
-      status: 'INSUFFICIENT_FUNDS',
-      change: [],
-    });
+  let totalCID = 0;
+  for (let element of cid) {
+    totalCID += element[1];
   }
+  totalCID = parseFloat(totalCID.toFixed(2));
 
-  if (cidSum - priceAndPaymentDifference === 0) {
-    return (change = {
-      status: 'CLOSED',
-      change: cid,
-    });
-  }
-
-  const onlyAvailablesEquivalencies = findOnlyAvailablesEquivalencies(
-    equivalencies,
-    priceAndPaymentDifference
-  );
-
-  while (priceAndPaymentDifference !== 0) {
-    const moneyToSubstract =
-      onlyAvailablesEquivalencies[onlyAvailablesEquivalencies.length - 1][1];
-
-    if (cid[onlyAvailablesEquivalencies.length - 1][1] - moneyToSubstract < 0) {
-      onlyAvailablesEquivalencies.splice(
-        onlyAvailablesEquivalencies.length - 1,
-        1
-      );
-    }
-    cid[onlyAvailablesEquivalencies.length - 1][1] -= moneyToSubstract;
-    priceAndPaymentDifference = priceAndPaymentDifference - moneyToSubstract;
-  }
-
-  return (change = {
-    status: 'OPEN',
-    change: cid,
-  });
-}
-
-function findOnlyAvailablesEquivalencies(
-  equivalencies,
-  priceAndPaymentDifference
-) {
-  const availablesEquivalencies = [];
-
-  for (let i = 0; i < equivalencies.length; i++) {
-    if (equivalencies[i][1] <= priceAndPaymentDifference) {
-      availablesEquivalencies.push(equivalencies[i]);
+  let changeToGive = cash - price;
+  const changeArray = [];
+  if (changeToGive > totalCID) {
+    return { status: 'INSUFFICIENT_FUNDS', change: changeArray };
+  } else if (parseFloat(changeToGive.toFixed(2)) === totalCID) {
+    return { status: 'CLOSED', change: cid };
+  } else {
+    cid = cid.reverse();
+    for (let elem of cid) {
+      let temp = [elem[0], 0];
+      while (changeToGive >= UNIT_AMOUNT[elem[0]] && elem[1] > 0) {
+        console.log(UNIT_AMOUNT[elem[0]]);
+        temp[1] += UNIT_AMOUNT[elem[0]];
+        elem[1] -= UNIT_AMOUNT[elem[0]];
+        changeToGive -= UNIT_AMOUNT[elem[0]];
+        changeToGive = parseFloat(changeToGive.toFixed(2));
+      }
+      console.log(UNIT_AMOUNT[elem[0]]);
+      if (temp[1] > 0) {
+        changeArray.push(temp);
+      }
     }
   }
-  return availablesEquivalencies;
+  if (changeToGive > 0) {
+    return { status: 'INSUFFICIENT_FUNDS', change: [] };
+  }
+  return { status: 'OPEN', change: changeArray };
 }
 
 console.log(
@@ -89,42 +59,42 @@ console.log(
     ['ONE HUNDRED', 100],
   ])
 );
-// console.log(
-//   checkCashRegister(3.26, 100, [
-//     ['PENNY', 1.01],
-//     ['NICKEL', 2.05],
-//     ['DIME', 3.1],
-//     ['QUARTER', 4.25],
-//     ['ONE', 90],
-//     ['FIVE', 55],
-//     ['TEN', 20],
-//     ['TWENTY', 60],
-//     ['ONE HUNDRED', 100],
-//   ])
-// );
-// console.log(
-//   checkCashRegister(19.5, 20, [
-//     ['PENNY', 0.5],
-//     ['NICKEL', 0],
-//     ['DIME', 0],
-//     ['QUARTER', 0],
-//     ['ONE', 0],
-//     ['FIVE', 0],
-//     ['TEN', 0],
-//     ['TWENTY', 0],
-//     ['ONE HUNDRED', 0],
-//   ])
-// );
-// console.log(
-//   checkCashRegister(19.5, 20, [
-//     ['PENNY', 0.01],
-//     ['NICKEL', 0],
-//     ['DIME', 0],
-//     ['QUARTER', 0],
-//     ['ONE', 0],
-//     ['FIVE', 0],
-//     ['TEN', 0],
-//     ['TWENTY', 0],
-//     ['ONE HUNDRED', 0],
-//   ])
-// );
+console.log(
+  checkCashRegister(3.26, 100, [
+    ['PENNY', 1.01],
+    ['NICKEL', 2.05],
+    ['DIME', 3.1],
+    ['QUARTER', 4.25],
+    ['ONE', 90],
+    ['FIVE', 55],
+    ['TEN', 20],
+    ['TWENTY', 60],
+    ['ONE HUNDRED', 100],
+  ])
+);
+console.log(
+  checkCashRegister(19.5, 20, [
+    ['PENNY', 0.5],
+    ['NICKEL', 0],
+    ['DIME', 0],
+    ['QUARTER', 0],
+    ['ONE', 0],
+    ['FIVE', 0],
+    ['TEN', 0],
+    ['TWENTY', 0],
+    ['ONE HUNDRED', 0],
+  ])
+);
+console.log(
+  checkCashRegister(19.5, 20, [
+    ['PENNY', 0.01],
+    ['NICKEL', 0],
+    ['DIME', 0],
+    ['QUARTER', 0],
+    ['ONE', 0],
+    ['FIVE', 0],
+    ['TEN', 0],
+    ['TWENTY', 0],
+    ['ONE HUNDRED', 0],
+  ])
+);
