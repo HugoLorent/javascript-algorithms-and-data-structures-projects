@@ -12,7 +12,7 @@ function checkCashRegister(price, cash, cid) {
     'ONE HUNDRED': 100.0,
   };
   let totalCID = 0;
-  for (let element of cid) {
+  for (const element of cid) {
     totalCID += element[1];
   }
   totalCID = parseFloat(totalCID.toFixed(2));
@@ -25,16 +25,14 @@ function checkCashRegister(price, cash, cid) {
     return { status: 'CLOSED', change: cid };
   } else {
     cid = cid.reverse();
-    for (let elem of cid) {
-      let temp = [elem[0], 0];
+    for (const elem of cid) {
+      const temp = [elem[0], 0];
       while (changeToGive >= UNIT_AMOUNT[elem[0]] && elem[1] > 0) {
-        console.log(UNIT_AMOUNT[elem[0]]);
         temp[1] += UNIT_AMOUNT[elem[0]];
         elem[1] -= UNIT_AMOUNT[elem[0]];
         changeToGive -= UNIT_AMOUNT[elem[0]];
         changeToGive = parseFloat(changeToGive.toFixed(2));
       }
-      console.log(UNIT_AMOUNT[elem[0]]);
       if (temp[1] > 0) {
         changeArray.push(temp);
       }
